@@ -1,8 +1,15 @@
 
-import React from 'react';
-import { Calendar as CalendarIcon, Clock, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar as CalendarIcon, Clock, Plus, X } from 'lucide-react';
 import AgentCard from '../AgentCard';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useForm } from 'react-hook-form';
+import { useToast } from '@/hooks/use-toast';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 interface Event {
   id: string;
@@ -17,7 +24,40 @@ interface SchedulerAgentProps {
   notifications?: number;
 }
 
-const SchedulerAgent = ({ events, status = 'idle', notifications = 0 }: SchedulerAgentProps) => {
+const SchedulerAgent = ({ events: initialEvents, status = 'idle', notifications = 0 }: SchedulerAgentProps) => {
+  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const { toast } = useToast();
+  
+  const form = useForm({
+    defaultValues: {
+      title: '',
+      time: '',
+      type: 'meeting' as 'meeting' | 'reminder' | 'task'
+    }
+  });
+
+  const onSubmit = (data: { title: string; time: string; type: 'meeting' | 'reminder' | 'task' }) => {
+    // Create new event
+    const newEvent: Event = {
+      id: `event-${Date.now()}`,
+      title: data.title,
+      time: data.time,
+      type: data.type
+    };
+
+    // Add to events
+    setEvents([...events, newEvent]);
+    setDialogOpen(false);
+    form.reset();
+    
+    // Show toast notification
+    toast({
+      title: "Event added",
+      description: `"${data.title}" has been added to your schedule.`,
+    });
+  };
+
   return (
     <AgentCard
       title="Scheduler Agent"
@@ -30,7 +70,7 @@ const SchedulerAgent = ({ events, status = 'idle', notifications = 0 }: Schedule
       <div className="space-y-3">
         <div className="flex justify-between items-center">
           <h3 className="text-sm font-medium">Upcoming Events</h3>
-          <Button size="sm" variant="outline" className="h-8">
+          <Button size="sm" variant="outline" className="h-8" onClick={() => setDialogOpen(true)}>
             <Plus className="h-3.5 w-3.5 mr-1" />
             Add
           </Button>
@@ -58,6 +98,81 @@ const SchedulerAgent = ({ events, status = 'idle', notifications = 0 }: Schedule
           )}
         </div>
       </div>
+
+      {/* Add Event Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New Event</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter event title" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Time</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. 10:00 AM" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Event Type</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex space-x-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="meeting" id="meeting" />
+                          <Label htmlFor="meeting">Meeting</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="task" id="task" />
+                          <Label htmlFor="task">Task</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="reminder" id="reminder" />
+                          <Label htmlFor="reminder">Reminder</Label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button type="submit">Add Event</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </AgentCard>
   );
 };

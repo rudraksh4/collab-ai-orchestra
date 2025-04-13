@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SchedulerAgent from './Agents/SchedulerAgent';
@@ -36,6 +36,8 @@ const DashboardOverview = ({
   coordinatorData,
   preferencesData
 }: DashboardOverviewProps) => {
+  const [localSchedulerData, setLocalSchedulerData] = useState(schedulerData);
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -107,9 +109,9 @@ const DashboardOverview = ({
         <TabsContent value="all" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <SchedulerAgent 
-              events={schedulerData.events}
-              status={schedulerData.status}
-              notifications={schedulerData.notifications}
+              events={localSchedulerData.events}
+              status={localSchedulerData.status}
+              notifications={localSchedulerData.notifications}
             />
             
             <EmailAgent 
@@ -171,7 +173,7 @@ const DashboardOverview = ({
             />
             
             <SchedulerAgent 
-              events={schedulerData.events}
+              events={localSchedulerData.events}
               status="idle"
               notifications={0}
             />

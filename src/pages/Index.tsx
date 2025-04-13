@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Dashboard/Header";
@@ -16,6 +15,7 @@ const Index = () => {
   const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeAgent, setActiveAgent] = useState("dashboard");
+  const [updatedSchedulerData, setUpdatedSchedulerData] = useState(schedulerData);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -28,7 +28,7 @@ const Index = () => {
         return (
           <DashboardOverview
             userData={userData}
-            schedulerData={schedulerData}
+            schedulerData={updatedSchedulerData}
             emailData={emailData}
             taskData={taskData}
             reminderData={reminderData}
@@ -42,9 +42,9 @@ const Index = () => {
             <h1 className="text-2xl font-bold mb-6">Scheduler Agent</h1>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <SchedulerAgent
-                events={schedulerData.events}
-                status={schedulerData.status as 'idle' | 'working' | 'completed'}
-                notifications={schedulerData.notifications}
+                events={updatedSchedulerData.events}
+                status={updatedSchedulerData.status as 'idle' | 'working' | 'completed'}
+                notifications={updatedSchedulerData.notifications}
               />
             </div>
           </div>
@@ -117,7 +117,7 @@ const Index = () => {
       default:
         return <DashboardOverview 
           userData={userData}
-          schedulerData={schedulerData}
+          schedulerData={updatedSchedulerData}
           emailData={emailData}
           taskData={taskData}
           reminderData={reminderData}
