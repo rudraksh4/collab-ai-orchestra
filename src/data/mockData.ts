@@ -13,32 +13,32 @@ export const userData = {
 };
 
 export const schedulerData = {
-  status: 'idle',
+  status: 'idle' as 'idle' | 'working' | 'completed',
   notifications: 0,
   events: [
     {
       id: "1",
       title: "Team Standup",
       time: "10:00 AM",
-      type: "meeting"
+      type: "meeting" as "meeting" | "reminder" | "task"
     },
     {
       id: "2",
       title: "Project Review",
       time: "2:30 PM",
-      type: "meeting"
+      type: "meeting" as "meeting" | "reminder" | "task"
     },
     {
       id: "3",
       title: "Deadline Reminder: Q2 Report",
       time: "5:00 PM",
-      type: "reminder"
+      type: "reminder" as "meeting" | "reminder" | "task"
     }
   ]
 };
 
 export const emailData = {
-  status: 'completed',
+  status: 'completed' as 'idle' | 'working' | 'completed',
   notifications: 3,
   emails: [
     {
@@ -49,7 +49,7 @@ export const emailData = {
       time: "11:42 AM",
       read: false,
       starred: true,
-      priority: "high"
+      priority: "high" as "high" | "medium" | "low"
     },
     {
       id: "2",
@@ -59,13 +59,13 @@ export const emailData = {
       time: "9:15 AM",
       read: true,
       starred: false,
-      priority: "medium"
+      priority: "medium" as "high" | "medium" | "low"
     }
   ]
 };
 
 export const taskData = {
-  status: 'working',
+  status: 'working' as 'idle' | 'working' | 'completed',
   notifications: 1,
   tasks: [
     {
@@ -73,34 +73,34 @@ export const taskData = {
       title: "Complete project proposal",
       completed: true,
       dueDate: "Today",
-      priority: "high"
+      priority: "high" as "high" | "medium" | "low"
     },
     {
       id: "2",
       title: "Review marketing materials",
       completed: false,
       dueDate: "Today",
-      priority: "medium"
+      priority: "medium" as "high" | "medium" | "low"
     },
     {
       id: "3",
       title: "Schedule team meeting",
       completed: false,
       dueDate: "Tomorrow",
-      priority: "low"
+      priority: "low" as "high" | "medium" | "low"
     },
     {
       id: "4",
       title: "Send weekly report",
       completed: false,
       dueDate: "Today",
-      priority: "high"
+      priority: "high" as "high" | "medium" | "low"
     }
   ]
 };
 
 export const reminderData = {
-  status: 'idle',
+  status: 'idle' as 'idle' | 'working' | 'completed',
   notifications: 0,
   reminders: [
     {
@@ -131,36 +131,36 @@ export const reminderData = {
 };
 
 export const coordinatorData = {
-  status: 'working',
+  status: 'working' as 'idle' | 'working' | 'completed',
   notifications: 0,
   agents: [
     {
       name: "Scheduler Agent",
-      status: "idle",
+      status: "idle" as 'idle' | 'working' | 'completed',
       load: 15,
       lastAction: "Updated calendar"
     },
     {
       name: "Email Handler Agent",
-      status: "completed",
+      status: "completed" as 'idle' | 'working' | 'completed',
       load: 45,
       lastAction: "Processed 5 emails"
     },
     {
       name: "Task Tracker Agent",
-      status: "working",
+      status: "working" as 'idle' | 'working' | 'completed',
       load: 70,
       lastAction: "Prioritizing tasks"
     },
     {
       name: "Reminder Agent",
-      status: "idle",
+      status: "idle" as 'idle' | 'working' | 'completed',
       load: 10,
       lastAction: "Added reminder"
     },
     {
       name: "User Preferences Agent",
-      status: "working",
+      status: "working" as 'idle' | 'working' | 'completed',
       load: 35,
       lastAction: "Learning patterns"
     }
@@ -168,7 +168,7 @@ export const coordinatorData = {
 };
 
 export const preferencesData = {
-  status: 'working',
+  status: 'working' as 'idle' | 'working' | 'completed',
   notifications: 0,
   preferences: [
     {

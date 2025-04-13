@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Dashboard/Header";
 import Sidebar from "@/components/Dashboard/Sidebar";
 import DashboardOverview from "@/components/Dashboard/DashboardOverview";
@@ -43,7 +43,7 @@ const Index = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <SchedulerAgent
                 events={schedulerData.events}
-                status={schedulerData.status}
+                status={schedulerData.status as 'idle' | 'working' | 'completed'}
                 notifications={schedulerData.notifications}
               />
             </div>
@@ -56,7 +56,7 @@ const Index = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <EmailAgent
                 emails={emailData.emails}
-                status={emailData.status}
+                status={emailData.status as 'idle' | 'working' | 'completed'}
                 notifications={emailData.notifications}
               />
             </div>
@@ -69,7 +69,7 @@ const Index = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <TaskAgent
                 tasks={taskData.tasks}
-                status={taskData.status}
+                status={taskData.status as 'idle' | 'working' | 'completed'}
                 notifications={taskData.notifications}
               />
             </div>
@@ -82,7 +82,7 @@ const Index = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <ReminderAgent
                 reminders={reminderData.reminders}
-                status={reminderData.status}
+                status={reminderData.status as 'idle' | 'working' | 'completed'}
                 notifications={reminderData.notifications}
               />
             </div>
@@ -95,7 +95,7 @@ const Index = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <CoordinatorAgent
                 agents={coordinatorData.agents}
-                status={coordinatorData.status}
+                status={coordinatorData.status as 'idle' | 'working' | 'completed'}
                 notifications={coordinatorData.notifications}
               />
             </div>
@@ -108,7 +108,7 @@ const Index = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <PreferencesAgent
                 preferences={preferencesData.preferences}
-                status={preferencesData.status}
+                status={preferencesData.status as 'idle' | 'working' | 'completed'}
                 notifications={preferencesData.notifications}
               />
             </div>
