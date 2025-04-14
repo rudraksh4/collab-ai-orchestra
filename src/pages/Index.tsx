@@ -4,13 +4,11 @@ import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Dashboard/Header";
 import Sidebar from "@/components/Dashboard/Sidebar";
 import DashboardOverview from "@/components/Dashboard/DashboardOverview";
-import { userData, schedulerData, emailData, taskData, reminderData, coordinatorData, preferencesData } from "@/data/mockData";
+import { userData, schedulerData, emailData, taskData, reminderData } from "@/data/mockData";
 import SchedulerAgent from "@/components/Dashboard/Agents/SchedulerAgent";
 import EmailAgent from "@/components/Dashboard/Agents/EmailAgent";
 import TaskAgent from "@/components/Dashboard/Agents/TaskAgent";
 import ReminderAgent from "@/components/Dashboard/Agents/ReminderAgent";
-import CoordinatorAgent from "@/components/Dashboard/Agents/CoordinatorAgent";
-import PreferencesAgent from "@/components/Dashboard/Agents/PreferencesAgent";
 
 const Index = () => {
   const { toast } = useToast();
@@ -18,6 +16,7 @@ const Index = () => {
   const [activeAgent, setActiveAgent] = useState("dashboard");
   const [updatedSchedulerData, setUpdatedSchedulerData] = useState(schedulerData);
   const [updatedReminderData, setUpdatedReminderData] = useState(reminderData);
+  const [updatedEmailData, setUpdatedEmailData] = useState(emailData);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -31,11 +30,9 @@ const Index = () => {
           <DashboardOverview
             userData={userData}
             schedulerData={updatedSchedulerData}
-            emailData={emailData}
+            emailData={updatedEmailData}
             taskData={taskData}
             reminderData={updatedReminderData}
-            coordinatorData={coordinatorData}
-            preferencesData={preferencesData}
           />
         );
       case "scheduler":
@@ -57,9 +54,9 @@ const Index = () => {
             <h1 className="text-2xl font-bold mb-6">Email Handler Agent</h1>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <EmailAgent
-                emails={emailData.emails}
-                status={emailData.status as 'idle' | 'working' | 'completed'}
-                notifications={emailData.notifications}
+                emails={updatedEmailData.emails}
+                status={updatedEmailData.status as 'idle' | 'working' | 'completed'}
+                notifications={updatedEmailData.notifications}
               />
             </div>
           </div>
@@ -90,41 +87,13 @@ const Index = () => {
             </div>
           </div>
         );
-      case "coordinator":
-        return (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">Coordinator Agent</h1>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <CoordinatorAgent
-                agents={coordinatorData.agents}
-                status={coordinatorData.status as 'idle' | 'working' | 'completed'}
-                notifications={coordinatorData.notifications}
-              />
-            </div>
-          </div>
-        );
-      case "preferences":
-        return (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">User Preferences Agent</h1>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <PreferencesAgent
-                preferences={preferencesData.preferences}
-                status={preferencesData.status as 'idle' | 'working' | 'completed'}
-                notifications={preferencesData.notifications}
-              />
-            </div>
-          </div>
-        );
       default:
         return <DashboardOverview 
           userData={userData}
           schedulerData={updatedSchedulerData}
-          emailData={emailData}
+          emailData={updatedEmailData}
           taskData={taskData}
           reminderData={updatedReminderData}
-          coordinatorData={coordinatorData}
-          preferencesData={preferencesData}
         />;
     }
   };

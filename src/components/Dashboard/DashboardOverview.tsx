@@ -6,8 +6,6 @@ import SchedulerAgent from './Agents/SchedulerAgent';
 import EmailAgent from './Agents/EmailAgent';
 import TaskAgent from './Agents/TaskAgent';
 import ReminderAgent from './Agents/ReminderAgent';
-import CoordinatorAgent from './Agents/CoordinatorAgent';
-import PreferencesAgent from './Agents/PreferencesAgent';
 import { Activity, CpuIcon, MessagesSquare, Zap } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
@@ -23,8 +21,6 @@ interface DashboardOverviewProps {
   emailData: any;
   taskData: any;
   reminderData: any;
-  coordinatorData: any;
-  preferencesData: any;
 }
 
 const DashboardOverview = ({ 
@@ -32,9 +28,7 @@ const DashboardOverview = ({
   schedulerData,
   emailData,
   taskData,
-  reminderData,
-  coordinatorData,
-  preferencesData
+  reminderData
 }: DashboardOverviewProps) => {
   const [localSchedulerData, setLocalSchedulerData] = useState(schedulerData);
 
@@ -131,30 +125,12 @@ const DashboardOverview = ({
               status={reminderData.status}
               notifications={reminderData.notifications}
             />
-            
-            <CoordinatorAgent 
-              agents={coordinatorData.agents}
-              status={coordinatorData.status}
-              notifications={coordinatorData.notifications}
-            />
-            
-            <PreferencesAgent 
-              preferences={preferencesData.preferences}
-              status={preferencesData.status}
-              notifications={preferencesData.notifications}
-            />
           </div>
         </TabsContent>
         
         <TabsContent value="active" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {/* Only show active agents here */}
-            <CoordinatorAgent 
-              agents={coordinatorData.agents}
-              status="working"
-              notifications={1}
-            />
-            
             <TaskAgent 
               tasks={taskData.tasks}
               status="working"

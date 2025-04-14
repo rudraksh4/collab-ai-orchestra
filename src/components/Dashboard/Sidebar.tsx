@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Calendar, Mail, CheckSquare, Bell, Settings, Users, Menu, Brain } from 'lucide-react';
+import { Home, Calendar, Mail, CheckSquare, Bell, Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from '@/lib/utils';
@@ -18,8 +18,6 @@ const sidebarItems = [
   { id: 'email', name: 'Email Handler', icon: Mail },
   { id: 'task', name: 'Task Tracker', icon: CheckSquare },
   { id: 'reminder', name: 'Reminder', icon: Bell },
-  { id: 'coordinator', name: 'Coordinator', icon: Brain },
-  { id: 'preferences', name: 'Preferences', icon: Settings },
 ];
 
 const Sidebar = ({ isOpen, toggleSidebar, activeAgent, setActiveAgent }: SidebarProps) => {
@@ -34,7 +32,7 @@ const Sidebar = ({ isOpen, toggleSidebar, activeAgent, setActiveAgent }: Sidebar
       <div className="h-full flex flex-col overflow-y-auto p-3">
         <div className="flex items-center justify-between mb-6 px-1 py-2">
           <a href="#" className="flex items-center">
-            <Brain className="h-8 w-8 text-primary" />
+            <Bell className="h-8 w-8 text-primary" />
             <span className="ml-2 text-xl font-bold">CollabAssist</span>
           </a>
           <Button 
@@ -77,16 +75,6 @@ const Sidebar = ({ isOpen, toggleSidebar, activeAgent, setActiveAgent }: Sidebar
         </div>
         
         <Separator />
-        
-        <div className="pt-4">
-          <Button 
-            variant="outline" 
-            className="w-full justify-start"
-          >
-            <Users className="h-5 w-5 mr-3 text-muted-foreground" />
-            Team Access
-          </Button>
-        </div>
       </div>
     </aside>
   );
