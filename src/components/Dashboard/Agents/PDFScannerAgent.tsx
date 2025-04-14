@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { File, Upload, FileText, AlignLeft, List, HelpCircle } from 'lucide-react';
+import { File, Upload, FileText, AlignLeft, List, HelpCircle, Clock, Settings } from 'lucide-react';
 import AgentCard from '../AgentCard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -9,6 +9,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { formatTime } from './EmailAgent/utils';
 
 interface Question {
   id: string;
@@ -31,6 +36,11 @@ const PDFScannerAgent = ({ status = 'idle', notifications = 0 }: PDFScannerAgent
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [numQuestions, setNumQuestions] = useState(5);
+  const [questionType, setQuestionType] = useState<'mcq' | 'descriptive'>('mcq');
+  const [studyTime, setStudyTime] = useState(0); // Time in seconds
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   // Simulate file upload
@@ -56,7 +66,47 @@ const PDFScannerAgent = ({ status = 'idle', notifications = 0 }: PDFScannerAgent
     }
   };
 
-  // Simulate PDF processing
+  // Timer functions
+  const startTimer = () => {
+    if (!isTimerActive) {
+      setIsTimerActive(true);
+      const interval = setInterval(() => {
+        setStudyTime(prevTime => prevTime + 1);
+      }, 1000);
+      setTimerInterval(interval);
+      toast({
+        title: "Study timer started",
+        description: "Your study session has begun.",
+      });
+    }
+  };
+
+  const stopTimer = () => {
+    if (isTimerActive && timerInterval) {
+      clearInterval(timerInterval);
+      setIsTimerActive(false);
+      setTimerInterval(null);
+      toast({
+        title: "Study timer paused",
+        description: `You've studied for ${formatTime(studyTime)}.`,
+      });
+    }
+  };
+
+  const resetTimer = () => {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+    }
+    setStudyTime(0);
+    setIsTimerActive(false);
+    setTimerInterval(null);
+    toast({
+      title: "Study timer reset",
+      description: "Your study timer has been reset to 0.",
+    });
+  };
+
+  // Simulate PDF processing with the new settings
   const processPDF = () => {
     if (!uploadedFile) {
       toast({
@@ -79,7 +129,7 @@ const PDFScannerAgent = ({ status = 'idle', notifications = 0 }: PDFScannerAgent
           generateMockQuestions();
           toast({
             title: "Processing completed",
-            description: "MCQ questions have been generated.",
+            description: `${questionType === 'mcq' ? 'MCQ' : 'Descriptive'} questions have been generated.`,
           });
           return 100;
         }
@@ -88,46 +138,36 @@ const PDFScannerAgent = ({ status = 'idle', notifications = 0 }: PDFScannerAgent
     }, 500);
   };
 
-  // Generate mock questions for demo
+  // Generate mock questions for demo based on selected settings
   const generateMockQuestions = () => {
-    const mockQuestions: Question[] = [
-      {
-        id: '1',
-        question: 'What is the main purpose of the PDF file format?',
-        options: [
-          'To edit documents easily',
-          'To present documents consistently across different platforms',
-          'To compress images only',
-          'To encrypt text files'
-        ],
-        correctAnswer: 'To present documents consistently across different platforms',
-        explanation: 'PDF (Portable Document Format) was created to ensure documents appear the same regardless of what hardware or software is used to view them.'
-      },
-      {
-        id: '2',
-        question: 'Which company created the PDF format?',
-        options: [
-          'Microsoft',
-          'Apple',
-          'Adobe',
-          'IBM'
-        ],
-        correctAnswer: 'Adobe',
-        explanation: 'PDF was created by Adobe in the early 1990s and later became an open standard.'
-      },
-      {
-        id: '3',
-        question: 'What does OCR stand for in document processing?',
-        options: [
-          'Optical Character Recognition',
-          'Original Content Reader',
-          'Output Content Rendering',
-          'Online Character Repository'
-        ],
-        correctAnswer: 'Optical Character Recognition',
-        explanation: 'OCR is a technology that recognizes text within a digital image, commonly used to convert scanned documents to editable text.'
-      },
-    ];
+    const mockQuestions: Question[] = [];
+    
+    // Generate the requested number of questions
+    for (let i = 0; i < numQuestions; i++) {
+      if (questionType === 'mcq') {
+        mockQuestions.push({
+          id: `${i + 1}`,
+          question: `Question ${i + 1}: What is the main concept discussed on page ${i + 1}?`,
+          options: [
+            `Option A for question ${i + 1}`,
+            `Option B for question ${i + 1}`,
+            `Option C for question ${i + 1}`,
+            `Option D for question ${i + 1}`
+          ],
+          correctAnswer: `Option A for question ${i + 1}`,
+          explanation: `The explanation for question ${i + 1} demonstrates the correct answer is Option A.`
+        });
+      } else {
+        // For descriptive questions, we still use the Question interface but with empty options
+        mockQuestions.push({
+          id: `${i + 1}`,
+          question: `Descriptive Question ${i + 1}: Explain the concept discussed on page ${i + 1}.`,
+          options: [],
+          correctAnswer: `Detailed explanation for question ${i + 1}.`,
+          explanation: `This is a descriptive question that requires a detailed answer.`
+        });
+      }
+    }
     
     setQuestions(mockQuestions);
   };
@@ -143,17 +183,22 @@ const PDFScannerAgent = ({ status = 'idle', notifications = 0 }: PDFScannerAgent
   };
 
   const checkAnswer = () => {
-    if (selectedQuestion && selectedOption) {
+    if (selectedQuestion && (selectedOption || questionType === 'descriptive')) {
       setShowAnswer(true);
-      if (selectedOption === selectedQuestion.correctAnswer) {
+      if (questionType === 'mcq' && selectedOption === selectedQuestion.correctAnswer) {
         toast({
           title: "Correct!",
           description: "You've selected the right answer.",
         });
-      } else {
+      } else if (questionType === 'mcq') {
         toast({
           title: "Incorrect",
           description: "Try again or view the explanation.",
+        });
+      } else {
+        toast({
+          title: "Answer shown",
+          description: "Compare your answer with the sample solution.",
         });
       }
     }
@@ -162,7 +207,7 @@ const PDFScannerAgent = ({ status = 'idle', notifications = 0 }: PDFScannerAgent
   return (
     <AgentCard
       title="PDF Scanner Agent"
-      description="Generate MCQ questions from PDF files"
+      description="Generate questions from PDF files"
       icon={FileText}
       color="#FF5722"
       status={status}
@@ -172,6 +217,8 @@ const PDFScannerAgent = ({ status = 'idle', notifications = 0 }: PDFScannerAgent
         <TabsList className="w-full">
           <TabsTrigger value="upload" className="flex-1">Upload</TabsTrigger>
           <TabsTrigger value="questions" className="flex-1">Questions</TabsTrigger>
+          <TabsTrigger value="settings" className="flex-1">Settings</TabsTrigger>
+          <TabsTrigger value="timer" className="flex-1">Study Timer</TabsTrigger>
         </TabsList>
         
         <TabsContent value="upload" className="mt-3">
@@ -210,7 +257,7 @@ const PDFScannerAgent = ({ status = 'idle', notifications = 0 }: PDFScannerAgent
                     className="w-full mt-3"
                     size="sm"
                   >
-                    Generate MCQ Questions
+                    Generate {questionType === 'mcq' ? 'MCQ' : 'Descriptive'} Questions
                   </Button>
                 )}
               </div>
@@ -255,51 +302,68 @@ const PDFScannerAgent = ({ status = 'idle', notifications = 0 }: PDFScannerAgent
                     <h3 className="text-sm font-medium">{selectedQuestion.question}</h3>
                   </div>
                   
-                  <div className="space-y-2 mb-4">
-                    {selectedQuestion.options.map((option, index) => (
-                      <div 
-                        key={index}
-                        className={`p-2 border rounded-md cursor-pointer ${
-                          selectedOption === option 
-                            ? 'border-primary bg-primary/5' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        } ${
-                          showAnswer && option === selectedQuestion.correctAnswer
-                            ? 'border-green-500 bg-green-50'
-                            : ''
-                        }`}
-                        onClick={() => handleOptionSelect(option)}
-                      >
-                        <span className="text-sm">{option}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {questionType === 'mcq' && selectedQuestion.options.length > 0 ? (
+                    <div className="space-y-2 mb-4">
+                      {selectedQuestion.options.map((option, index) => (
+                        <div 
+                          key={index}
+                          className={`p-2 border rounded-md cursor-pointer ${
+                            selectedOption === option 
+                              ? 'border-primary bg-primary/5' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          } ${
+                            showAnswer && option === selectedQuestion.correctAnswer
+                              ? 'border-green-500 bg-green-50'
+                              : ''
+                          }`}
+                          onClick={() => handleOptionSelect(option)}
+                        >
+                          <span className="text-sm">{option}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : questionType === 'descriptive' ? (
+                    <div className="mb-4">
+                      <textarea 
+                        className="w-full p-2 border rounded-md h-32" 
+                        placeholder="Type your answer here..."
+                      />
+                    </div>
+                  ) : null}
                   
                   <div className="flex justify-between">
                     <Button 
                       onClick={checkAnswer} 
-                      disabled={!selectedOption}
+                      disabled={questionType === 'mcq' && !selectedOption}
                       size="sm"
                     >
-                      Check Answer
+                      {questionType === 'mcq' ? 'Check Answer' : 'Show Solution'}
                     </Button>
                     
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="outline" size="sm">
                           <HelpCircle className="h-4 w-4 mr-1" />
-                          Explanation
+                          {questionType === 'mcq' ? 'Explanation' : 'Sample Answer'}
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Answer Explanation</DialogTitle>
+                          <DialogTitle>
+                            {questionType === 'mcq' ? 'Answer Explanation' : 'Sample Answer'}
+                          </DialogTitle>
                         </DialogHeader>
                         <div className="pt-2">
-                          <p className="mb-2 font-medium">
-                            Correct answer: {selectedQuestion.correctAnswer}
-                          </p>
-                          <p>{selectedQuestion.explanation}</p>
+                          {questionType === 'mcq' ? (
+                            <>
+                              <p className="mb-2 font-medium">
+                                Correct answer: {selectedQuestion.correctAnswer}
+                              </p>
+                              <p>{selectedQuestion.explanation}</p>
+                            </>
+                          ) : (
+                            <p>{selectedQuestion.correctAnswer}</p>
+                          )}
                         </div>
                       </DialogContent>
                     </Dialog>
@@ -314,6 +378,97 @@ const PDFScannerAgent = ({ status = 'idle', notifications = 0 }: PDFScannerAgent
                 </div>
               )}
             </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="settings" className="mt-3">
+          <div className="space-y-4 p-3 bg-gray-50 rounded-md">
+            <div className="flex items-center space-x-2 mb-4">
+              <Settings className="h-5 w-5 text-primary" />
+              <h3 className="text-sm font-medium">Question Generation Settings</h3>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="num-questions">Number of Questions</Label>
+                <div className="flex items-center mt-1.5">
+                  <Input 
+                    id="num-questions" 
+                    type="number" 
+                    min="1" 
+                    max="20"
+                    value={numQuestions} 
+                    onChange={(e) => setNumQuestions(parseInt(e.target.value) || 5)}
+                    className="w-24"
+                  />
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    (1-20 questions)
+                  </span>
+                </div>
+              </div>
+              
+              <div>
+                <Label className="block mb-2">Question Type</Label>
+                <RadioGroup 
+                  value={questionType} 
+                  onValueChange={(value) => setQuestionType(value as 'mcq' | 'descriptive')}
+                  className="flex flex-col space-y-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="mcq" id="mcq" />
+                    <Label htmlFor="mcq" className="cursor-pointer">Multiple Choice (MCQ)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="descriptive" id="descriptive" />
+                    <Label htmlFor="descriptive" className="cursor-pointer">Descriptive</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              
+              <Button onClick={processPDF} disabled={!uploadedFile}>
+                Apply Settings
+              </Button>
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="timer" className="mt-3">
+          <div className="text-center space-y-4 py-2">
+            <div className="inline-flex items-center bg-gray-100 px-4 py-6 rounded-lg">
+              <Clock className="h-6 w-6 mr-2 text-primary" />
+              <span className="text-3xl font-mono font-bold">{formatTime(studyTime)}</span>
+            </div>
+            
+            <div className="flex justify-center gap-2">
+              {!isTimerActive ? (
+                <Button 
+                  variant="default" 
+                  onClick={startTimer}
+                  className="px-4"
+                >
+                  Start
+                </Button>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  onClick={stopTimer}
+                  className="px-4"
+                >
+                  Pause
+                </Button>
+              )}
+              <Button 
+                variant="destructive" 
+                onClick={resetTimer}
+                className="px-4"
+              >
+                Reset
+              </Button>
+            </div>
+            
+            <p className="text-sm text-muted-foreground mt-2">
+              Track your study time to improve productivity
+            </p>
           </div>
         </TabsContent>
       </Tabs>
