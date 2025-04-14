@@ -9,6 +9,7 @@ import SchedulerAgent from "@/components/Dashboard/Agents/SchedulerAgent";
 import EmailAgent from "@/components/Dashboard/Agents/EmailAgent";
 import TaskAgent from "@/components/Dashboard/Agents/TaskAgent";
 import ReminderAgent from "@/components/Dashboard/Agents/ReminderAgent";
+import PDFScannerAgent from "@/components/Dashboard/Agents/PDFScannerAgent";
 
 const Index = () => {
   const { toast } = useToast();
@@ -83,6 +84,18 @@ const Index = () => {
                 reminders={updatedReminderData.reminders}
                 status={updatedReminderData.status as 'idle' | 'working' | 'completed'}
                 notifications={updatedReminderData.notifications}
+              />
+            </div>
+          </div>
+        );
+      case "pdfscanner":
+        return (
+          <div className="p-6">
+            <h1 className="text-2xl font-bold mb-6">PDF Scanner Agent</h1>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <PDFScannerAgent
+                status="idle"
+                notifications={0}
               />
             </div>
           </div>

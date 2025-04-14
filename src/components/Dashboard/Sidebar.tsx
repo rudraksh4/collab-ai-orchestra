@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Calendar, Mail, CheckSquare, Bell, Menu } from 'lucide-react';
+import { Home, Calendar, Mail, CheckSquare, Bell, Menu, FileText } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from '@/lib/utils';
@@ -18,6 +18,7 @@ const sidebarItems = [
   { id: 'email', name: 'Email Handler', icon: Mail },
   { id: 'task', name: 'Task Tracker', icon: CheckSquare },
   { id: 'reminder', name: 'Reminder', icon: Bell },
+  { id: 'pdfscanner', name: 'PDF Scanner', icon: FileText },
 ];
 
 const Sidebar = ({ isOpen, toggleSidebar, activeAgent, setActiveAgent }: SidebarProps) => {

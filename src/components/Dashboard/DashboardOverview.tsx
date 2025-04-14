@@ -6,6 +6,7 @@ import SchedulerAgent from './Agents/SchedulerAgent';
 import EmailAgent from './Agents/EmailAgent';
 import TaskAgent from './Agents/TaskAgent';
 import ReminderAgent from './Agents/ReminderAgent';
+import PDFScannerAgent from './Agents/PDFScannerAgent';
 import { Activity, CpuIcon, MessagesSquare, Zap } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
@@ -125,6 +126,11 @@ const DashboardOverview = ({
               status={reminderData.status}
               notifications={reminderData.notifications}
             />
+
+            <PDFScannerAgent 
+              status="idle"
+              notifications={0}
+            />
           </div>
         </TabsContent>
         
@@ -150,6 +156,11 @@ const DashboardOverview = ({
             
             <SchedulerAgent 
               events={localSchedulerData.events}
+              status="idle"
+              notifications={0}
+            />
+
+            <PDFScannerAgent 
               status="idle"
               notifications={0}
             />
